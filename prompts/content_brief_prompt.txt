@@ -1,0 +1,17 @@
+You are a content strategist specializing in HCM thought leadership. Create a detailed content brief for a blog post on the topic: "{topic}"
+
+The brief should include:
+
+1. **Objective**: What the post aims to achieve
+2. **Target Audience**: Who the post is for
+3. **Key Messages**: 3-5 main points to convey
+4. **Structure Outline**:
+   - Introduction (hook and thesis)
+   - Body sections (with headings and key points)
+   - Conclusion (call to action or key takeaway)
+5. **Tone and Style**: Professional, insightful, conversational
+6. **Word Count**: Approximately 1000 words
+7. **SEO Keywords**: Primary and secondary keywords
+8. **Sources/Research**: Types of data or examples to include
+
+Ensure the structure supports thought leadership without product promotion.

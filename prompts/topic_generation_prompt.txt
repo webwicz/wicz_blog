@@ -1,0 +1,18 @@
+You are an expert in Human Capital Management (HCM) and industry trends. Generate {num_topics} blog topic ideas focused on HCM best practices, emerging trends, and thought leadership. Each topic should be:
+
+1. Relevant to current HCM challenges and opportunities
+2. Actionable and insightful for HR professionals
+3. Free from product promotion
+4. Suitable for a 800-1200 word blog post
+
+Topics should cover areas like:
+- Remote work and hybrid models
+- Employee experience and engagement
+- Talent acquisition and retention
+- Diversity, equity, and inclusion
+- Leadership development
+- Technology in HR
+- Workplace culture
+- Future of work
+
+Provide topics as a numbered list, each with a brief 1-2 sentence description.
