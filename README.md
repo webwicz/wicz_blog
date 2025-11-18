@@ -74,12 +74,10 @@ The system is designed to support thought-leadership content creation without pr
    url = publish_post(edited_draft, platform="medium", status="draft")
    ```
 
-6. Amplify on social media:
+6. Run the tri-weekly scheduler:
    ```python
-   from src.buffer_social_workflow import run_social_workflow
-
-   # Run the workflow to check RSS and schedule posts
-   run_social_workflow()
+   from src.scheduler import main
+   main()  # Checks schedule and runs appropriate workflows
    ```
 
 ### Running Tests
@@ -97,16 +95,23 @@ pytest tests/
 - `config/`: API keys and environment variables
 - `prompts/`: Default AI prompts and agent instructions
 
-## Social Media Automation with Buffer
+## Tri-Weekly Cadence Workflow
 
-The pipeline includes automated social media posting via Buffer:
+The pipeline operates on a tri-weekly schedule (Monday, Wednesday, Friday):
 
-- Monitors RSS feeds for new Medium/Substack posts
-- Generates AI-powered teaser snippets
-- Schedules posts on LinkedIn and X/Twitter with configurable delays
-- Logs all activities for monitoring
+- **Monday**: Weekly HCM topic research (generates 10 research topics)
+- **Monday/Wednesday/Friday**: Topic report generation (curated list of 3-5 topics to draft)
 
-Configure your Buffer access token and RSS feed URL in `.env`.
+Reports are automatically uploaded to Nextcloud for review and drafting management.
+
+### Running the Scheduler
+
+```python
+from src.scheduler import main
+main()  # Run daily to check schedule
+```
+
+Or set up a cron job to run `python src/scheduler.py` daily.
 
 ## Contributing
 

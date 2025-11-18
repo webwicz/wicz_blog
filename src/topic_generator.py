@@ -6,6 +6,7 @@ This module generates HCM blog topic ideas using AI.
 
 import os
 import logging
+from datetime import datetime
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -28,18 +29,26 @@ def load_prompt():
         logger.error("Topic generation prompt file not found.")
         raise
 
-def generate_topics(num_topics=5):
+def generate_topics(num_topics=5, mode='research'):
     """
     Generate blog topic ideas for HCM.
 
     Args:
         num_topics (int): Number of topics to generate
+        mode (str): 'research' for weekly research, 'report' for tri-weekly report
 
     Returns:
-        list: List of generated topic strings
+        list or str: List of topics or report content
     """
     try:
         prompt = load_prompt().format(num_topics=num_topics)
+
+        if mode == 'research':
+            # Weekly research mode: generate broad topics
+            prompt += "\n\nFocus on emerging trends, challenges, and opportunities in HCM for the coming week."
+        elif mode == 'report':
+            # Tri-weekly report mode: select and prioritize topics
+            prompt += "\n\nProvide a curated report of the top 3-5 topics to draft articles about this week, with brief rationale for each."
 
         response = client.chat.completions.create(
             model="grok-4-fast-non-reasoning",
@@ -47,16 +56,23 @@ def generate_topics(num_topics=5):
                 {"role": "system", "content": "You are an expert HCM content strategist."},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=1000,
+            max_tokens=1000 if mode == 'research' else 1500,
             temperature=0.7
         )
 
-        topics_text = response.choices[0].message.content.strip()
-        # Parse the response into a list (assuming numbered list)
-        topics = [line.strip() for line in topics_text.split('\n') if line.strip() and line[0].isdigit()]
+        content = response.choices[0].message.content.strip()
 
-        logger.info(f"Generated {len(topics)} topics.")
-        return topics
+        if mode == 'research':
+            # Parse into list
+            topics = [line.strip() for line in content.split('\n') if line.strip() and line[0].isdigit()]
+            logger.info(f"Generated {len(topics)} research topics.")
+            return topics
+        elif mode == 'report':
+            # Return formatted report
+            report = f"# HCM Topic Report - {datetime.now().strftime('%Y-%m-%d')}\n\n{content}"
+            logger.info("Generated topic report.")
+            return report
+
     except Exception as e:
         logger.error(f"Error generating topics: {e}")
         raise
