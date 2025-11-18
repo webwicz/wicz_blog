@@ -2,18 +2,19 @@
 
 ## Project Overview
 
-This project is an AI-assisted blogging system focused on Human Capital Management (HCM), industry trends, and best practices. It provides a modular pipeline for generating blog topics, creating content briefs, drafting articles, editing for human-like quality, publishing to platforms like WordPress or Ghost, and collecting analytics on engagement.
+This project is an AI-assisted blogging system focused on Human Capital Management (HCM), industry trends, and best practices. It provides a modular pipeline for generating blog topics, creating content briefs, drafting articles, editing for human-like quality, publishing to Medium, and amplifying on social media (LinkedIn and X/Twitter).
 
-The system is designed to support thought-leadership content creation without product promotion, leveraging AI agents to streamline the blogging process.
+The system is designed to support thought-leadership content creation without product promotion, leveraging AI agents to streamline the blogging process. Content is stored in Markdown locally for version control.
 
 ## Features
 
 - **Topic Generation**: AI-powered generation of relevant HCM blog topics based on current trends.
-- **Content Briefing**: Structured outlines for blog posts.
-- **Draft Writing**: Automated first drafts using AI.
-- **Editing**: Refinement and humanization of AI-generated text.
-- **Publishing**: Automated publishing to WordPress/Ghost via API.
-- **Analytics**: Collection of engagement metrics.
+- **Content Briefing**: Structured outlines for blog posts with SEO and structure focus.
+- **Draft Writing**: Automated first drafts using AI, output in Markdown.
+- **Editing**: Refinement and humanization of AI-generated text, preserving Markdown.
+- **Medium Publishing**: Direct export to Medium via API.
+- **Social Amplification**: Automated posting of snippets to LinkedIn and X/Twitter.
+- **Analytics**: Collection of engagement metrics from Medium and social platforms.
 
 ## Installation
 
@@ -32,7 +33,7 @@ The system is designed to support thought-leadership content creation without pr
 
 3. Configure environment variables:
    - Copy `config/.env.template` to `config/.env`
-   - Fill in your API keys (OpenAI, WordPress, etc.)
+   - Fill in your API keys (OpenAI, Medium, Twitter, LinkedIn)
 
 ## Usage
 
@@ -66,11 +67,19 @@ The system is designed to support thought-leadership content creation without pr
    edited_draft = edit_draft(draft)
    ```
 
-5. Publish:
+5. Publish to Medium:
    ```python
    from src.publisher import publish_post
 
-   publish_post(edited_draft, platform="wordpress")
+   url = publish_post(edited_draft, platform="medium", status="draft")
+   ```
+
+6. Amplify on social media:
+   ```python
+   from src.buffer_social_workflow import run_social_workflow
+
+   # Run the workflow to check RSS and schedule posts
+   run_social_workflow()
    ```
 
 ### Running Tests
@@ -84,9 +93,20 @@ pytest tests/
 - `src/`: Source code for the pipeline modules
 - `tests/`: Unit and integration tests
 - `notebooks/`: Jupyter notebooks for prototyping AI prompts
-- `data/`: Topic trends and scraped data
+- `data/`: Topic trends and scraped data, analytics storage
 - `config/`: API keys and environment variables
 - `prompts/`: Default AI prompts and agent instructions
+
+## Social Media Automation with Buffer
+
+The pipeline includes automated social media posting via Buffer:
+
+- Monitors RSS feeds for new Medium/Substack posts
+- Generates AI-powered teaser snippets
+- Schedules posts on LinkedIn and X/Twitter with configurable delays
+- Logs all activities for monitoring
+
+Configure your Buffer access token and RSS feed URL in `.env`.
 
 ## Contributing
 

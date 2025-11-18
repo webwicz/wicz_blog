@@ -5,8 +5,13 @@ This module refines and humanizes AI-generated blog post drafts.
 """
 
 import os
+import logging
 from openai import OpenAI
 from dotenv import load_dotenv
+
+# Setup logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv(dotenv_path='../config/.env')
@@ -16,8 +21,12 @@ client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 def load_prompt():
     """Load the editor agent prompt from file."""
-    with open('../prompts/editor_agent_prompt.txt', 'r') as f:
-        return f.read()
+    try:
+        with open('../prompts/editor_agent_prompt.txt', 'r') as f:
+            return f.read()
+    except FileNotFoundError:
+        logger.error("Editor agent prompt file not found.")
+        raise
 
 def edit_draft(draft):
     """
@@ -27,23 +36,28 @@ def edit_draft(draft):
         draft (str): The original draft
 
     Returns:
-        str: The edited draft
+        str: The edited draft in Markdown
     """
-    prompt = load_prompt().format(draft=draft)
+    try:
+        prompt = load_prompt().format(draft=draft)
 
-    response = client.chat.completions.create(
-        model="gpt-4",
-        messages=[
-            {"role": "system", "content": "You are an experienced editor for HCM blog content."},
-            {"role": "user", "content": prompt}
-        ],
-        max_tokens=2000,
-        temperature=0.5
-    )
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are an experienced editor for HCM blog content."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=2000,
+            temperature=0.5
+        )
 
-    edited_draft = response.choices[0].message.content.strip()
+        edited_draft = response.choices[0].message.content.strip()
 
-    return edited_draft
+        logger.info("Draft edited successfully.")
+        return edited_draft
+    except Exception as e:
+        logger.error(f"Error editing draft: {e}")
+        raise
 
 # Example usage
 if __name__ == "__main__":

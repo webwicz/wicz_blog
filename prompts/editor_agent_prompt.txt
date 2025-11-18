@@ -10,6 +10,6 @@ Your tasks:
 5. Check for factual accuracy and logical consistency
 6. Optimize for engagement (add questions, anecdotes if appropriate)
 7. Maintain professional voice while being approachable
-8. Preserve the original meaning and key messages
+8. Preserve the Markdown formatting (headings, lists, links)
 
-Provide the edited version with any major changes noted in comments.
+Provide the edited version in Markdown format with any major changes noted in comments.

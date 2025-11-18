@@ -5,35 +5,46 @@ This module collects engagement metrics for published blog posts.
 """
 
 import os
+import logging
 import requests
 from dotenv import load_dotenv
+
+# Setup logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv(dotenv_path='../config/.env')
 
-def get_ga_data(post_id, start_date, end_date):
+def get_medium_analytics(post_id):
     """
-    Fetch Google Analytics data for a blog post.
+    Fetch Medium analytics for a post.
 
     Args:
-        post_id (str): Identifier for the post
-        start_date (str): Start date in YYYY-MM-DD format
-        end_date (str): End date in YYYY-MM-DD format
+        post_id (str): Medium post ID
 
     Returns:
         dict: Analytics data
     """
-    # This is a simplified example. In reality, you'd use Google Analytics API
-    # For now, return mock data
-    return {
-        'page_views': 1250,
-        'unique_visitors': 890,
-        'avg_time_on_page': '3:45',
-        'bounce_rate': 0.35,
-        'social_shares': 45
-    }
+    # Medium API for stats
+    # This is a placeholder; Medium API may not provide detailed stats
+    return {'views': 0, 'reads': 0, 'claps': 0}
 
-def collect_analytics(post_id, platform='wordpress'):
+def get_social_analytics(platform, post_id):
+    """
+    Fetch social media analytics.
+
+    Args:
+        platform (str): 'linkedin' or 'twitter'
+        post_id (str): Post ID
+
+    Returns:
+        dict: Analytics data
+    """
+    # Placeholder for social analytics
+    return {'likes': 0, 'shares': 0, 'comments': 0}
+
+def collect_analytics(post_id, platform='medium'):
     """
     Collect analytics for a published post.
 
@@ -44,18 +55,22 @@ def collect_analytics(post_id, platform='wordpress'):
     Returns:
         dict: Collected metrics
     """
-    # For WordPress, you might use plugins or APIs to get data
-    # For now, return sample data
-    analytics = {
-        'post_id': post_id,
-        'platform': platform,
-        'metrics': get_ga_data(post_id, '2024-01-01', '2024-12-31')
-    }
+    try:
+        analytics = {
+            'post_id': post_id,
+            'platform': platform,
+            'platform_analytics': get_medium_analytics(post_id) if platform == 'medium' else {},
+            'social_analytics': {}  # Can be populated with LinkedIn/Twitter data
+        }
 
-    # Save to data file
-    save_analytics(analytics)
+        # Save to data file
+        save_analytics(analytics)
 
-    return analytics
+        logger.info(f"Analytics collected for post {post_id}")
+        return analytics
+    except Exception as e:
+        logger.error(f"Error collecting analytics: {e}")
+        raise
 
 def save_analytics(analytics):
     """Save analytics data to a JSON file."""

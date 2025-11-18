@@ -2,4 +2,5 @@ openai>=1.0.0
 requests>=2.25.0
 pytest>=6.0.0
 python-dotenv>=0.19.0
-python-wordpress-xmlrpc>=2.3.0
+medium-sdk>=0.1.0
+feedparser>=6.0.0

@@ -1,58 +1,72 @@
 """
 Publisher Module
 
-This module publishes blog posts to platforms like WordPress or Ghost.
+This module publishes blog posts to Medium.
 """
 
 import os
+import logging
 from dotenv import load_dotenv
-from wordpress_xmlrpc import Client, WordPressPost
-from wordpress_xmlrpc.methods.posts import NewPost
+from medium import Client
+
+# Setup logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv(dotenv_path='../config/.env')
 
-def publish_to_wordpress(title, content, status='draft'):
+def publish_to_medium(title, content, tags=None, publish_status='draft'):
     """
-    Publish a blog post to WordPress.
+    Publish a blog post to Medium.
 
     Args:
         title (str): Post title
-        content (str): Post content
-        status (str): Post status ('draft', 'publish')
+        content (str): Post content in Markdown
+        tags (list): List of tags
+        publish_status (str): 'draft' or 'public'
 
     Returns:
-        str: Post ID or success message
+        str: Post URL or success message
     """
-    wp_url = os.getenv('WORDPRESS_URL')
-    wp_username = os.getenv('WORDPRESS_USERNAME')
-    wp_password = os.getenv('WORDPRESS_PASSWORD')
+    try:
+        integration_token = os.getenv('MEDIUM_INTEGRATION_TOKEN')
+        if not integration_token:
+            raise ValueError("MEDIUM_INTEGRATION_TOKEN not set")
 
-    client = Client(wp_url, wp_username, wp_password)
+        client = Client(access_token=integration_token)
+        user = client.get_current_user()
 
-    post = WordPressPost()
-    post.title = title
-    post.content = content
-    post.post_status = status
+        post = client.create_post(
+            user_id=user['id'],
+            title=title,
+            content=content,
+            content_format='markdown',
+            tags=tags or ['HCM', 'HR', 'Thought Leadership'],
+            publish_status=publish_status
+        )
 
-    post_id = client.call(NewPost(post))
+        logger.info(f"Post published to Medium: {post['url']}")
+        return post['url']
+    except Exception as e:
+        logger.error(f"Error publishing to Medium: {e}")
+        raise
 
-    return f"Post published with ID: {post_id}"
-
-def publish_post(content, platform='wordpress', title='HCM Blog Post', status='draft'):
+def publish_post(content, platform='medium', title='HCM Blog Post', tags=None, status='draft'):
     """
     Publish a blog post to the specified platform.
 
     Args:
-        content (str): The full post content (including title if needed)
-        platform (str): Platform to publish to ('wordpress', 'ghost')
+        content (str): The full post content in Markdown
+        platform (str): Platform to publish to ('medium')
         title (str): Post title
+        tags (list): Tags for the post
         status (str): Publication status
 
     Returns:
-        str: Success message
+        str: Success message or URL
     """
-    if platform == 'wordpress':
+    if platform == 'medium':
         # Extract title from content if not provided separately
         lines = content.split('\n')
         if not title or title == 'HCM Blog Post':
@@ -61,8 +75,9 @@ def publish_post(content, platform='wordpress', title='HCM Blog Post', status='d
         else:
             content_body = content
 
-        return publish_to_wordpress(title, content_body, status)
+        return publish_to_medium(title, content_body, tags, status)
     else:
+        logger.warning(f"Publishing to {platform} not implemented yet")
         return f"Publishing to {platform} not implemented yet"
 
 # Example usage

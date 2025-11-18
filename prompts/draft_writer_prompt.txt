@@ -6,10 +6,11 @@ Instructions:
 - Write in a professional yet engaging tone
 - Use varied sentence structure to sound human-like
 - Include relevant examples and data points
-- Structure the post with clear headings
+- Structure the post with clear headings (use Markdown # ## ###)
 - End with a strong conclusion and call to action
 - Aim for approximately 1000 words
 - Incorporate SEO keywords naturally
 - Focus on thought leadership and best practices
+- Output the entire post in Markdown format, including title as # Title
 
 Ensure the content is original, insightful, and free from product promotion.
