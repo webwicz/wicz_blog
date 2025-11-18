@@ -47,6 +47,11 @@ def upload_to_nextcloud(file_path, remote_path):
             logger.warning("Nextcloud credentials not set, skipping upload.")
             return
 
+        # Ensure the directory exists
+        dir_path = os.path.dirname(remote_path)
+        if dir_path and dir_path != '/':
+            create_nextcloud_directory(dir_path, nextcloud_url, username, password)
+
         with open(file_path, 'rb') as f:
             response = requests.put(
                 f"{nextcloud_url}{remote_path}",
@@ -57,6 +62,25 @@ def upload_to_nextcloud(file_path, remote_path):
         logger.info(f"Uploaded {file_path} to Nextcloud: {remote_path}")
     except Exception as e:
         logger.error(f"Error uploading to Nextcloud: {e}")
+
+def create_nextcloud_directory(dir_path, base_url, username, password):
+    """
+    Create a directory in Nextcloud via WebDAV if it doesn't exist.
+
+    Args:
+        dir_path (str): Directory path to create
+        base_url (str): Nextcloud WebDAV base URL
+        username (str): Nextcloud username
+        password (str): Nextcloud password
+    """
+    try:
+        response = requests.request('MKCOL', f"{base_url}{dir_path}", auth=(username, password))
+        if response.status_code in [201, 405]:  # 201 created, 405 already exists
+            logger.info(f"Directory {dir_path} ready in Nextcloud")
+        else:
+            logger.warning(f"Failed to create directory {dir_path}: {response.status_code}")
+    except Exception as e:
+        logger.error(f"Error creating Nextcloud directory: {e}")
 
 def run_weekly_workflow():
     """Run weekly research on Monday."""

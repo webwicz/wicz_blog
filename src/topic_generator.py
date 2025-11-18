@@ -17,8 +17,12 @@ logger = logging.getLogger(__name__)
 # Load environment variables
 load_dotenv(dotenv_path='../config/.env')
 
-# Initialize x.ai client
-client = OpenAI(api_key=os.getenv('XAI_API_KEY'), base_url="https://api.x.ai/v1")
+def get_client():
+    """Get x.ai client, initializing only when needed."""
+    api_key = os.getenv('XAI_API_KEY')
+    if not api_key:
+        raise ValueError("XAI_API_KEY environment variable not set")
+    return OpenAI(api_key=api_key, base_url="https://api.x.ai/v1")
 
 def load_prompt():
     """Load the topic generation prompt from file."""
@@ -51,7 +55,7 @@ def generate_topics(num_topics=5, mode='research'):
             # Tri-weekly report mode: select and prioritize topics
             prompt += "\n\nProvide a curated report of the top 3-5 topics to draft articles about this week, with brief rationale for each."
 
-        response = client.chat.completions.create(
+        response = get_client().chat.completions.create(
             model="grok-4-fast-non-reasoning",
             messages=[
                 {"role": "system", "content": "You are an expert HCM content strategist."},

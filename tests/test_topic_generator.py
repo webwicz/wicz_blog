@@ -13,13 +13,15 @@ def test_load_prompt():
     assert len(prompt) > 0
     assert "HCM" in prompt
 
-@patch('src.topic_generator.client')
-def test_generate_topics(mock_client):
-    """Test topic generation with mocked OpenAI response."""
-    # Mock the response
+@patch('src.topic_generator.get_client')
+def test_generate_topics(mock_get_client):
+    """Test topic generation with mocked x.ai response."""
+    # Mock the client and response
+    mock_client = MagicMock()
     mock_response = MagicMock()
     mock_response.choices[0].message.content = "1. Topic One\n2. Topic Two\n3. Topic Three"
     mock_client.chat.completions.create.return_value = mock_response
+    mock_get_client.return_value = mock_client
 
     topics = generate_topics(3)
 
