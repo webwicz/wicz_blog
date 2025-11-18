@@ -64,7 +64,7 @@ def run_weekly_workflow():
     try:
         topics = generate_topics(num_topics=10, mode='research')
         # Save research topics for later use
-        research_file = f"../data/research_topics_{datetime.now().strftime('%Y-%m-%d')}.txt"
+        research_file = os.path.join(os.path.dirname(__file__), '..', 'data', f"research_topics_{datetime.now().strftime('%Y-%m-%d')}.txt")
         with open(research_file, 'w') as f:
             f.write('\n'.join(topics))
         logger.info(f"Saved research topics to {research_file}")
@@ -78,7 +78,7 @@ def run_tri_weekly_workflow():
     try:
         report = generate_topics(num_topics=5, mode='report')
         # Save report
-        report_file = f"../data/topic_report_{datetime.now().strftime('%Y-%m-%d')}.md"
+        report_file = os.path.join(os.path.dirname(__file__), '..', 'data', f"topic_report_{datetime.now().strftime('%Y-%m-%d')}.md")
         with open(report_file, 'w') as f:
             f.write(report)
         logger.info(f"Saved topic report to {report_file}")

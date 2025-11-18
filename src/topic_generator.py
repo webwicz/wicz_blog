@@ -23,7 +23,8 @@ client = OpenAI(api_key=os.getenv('XAI_API_KEY'), base_url="https://api.x.ai/v1"
 def load_prompt():
     """Load the topic generation prompt from file."""
     try:
-        with open('../prompts/topic_generation_prompt.txt', 'r') as f:
+        prompt_path = os.path.join(os.path.dirname(__file__), '..', 'prompts', 'topic_generation_prompt.txt')
+        with open(prompt_path, 'r') as f:
             return f.read()
     except FileNotFoundError:
         logger.error("Topic generation prompt file not found.")

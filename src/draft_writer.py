@@ -22,7 +22,8 @@ client = OpenAI(api_key=os.getenv('XAI_API_KEY'), base_url="https://api.x.ai/v1"
 def load_prompt():
     """Load the draft writer prompt from file."""
     try:
-        with open('../prompts/draft_writer_prompt.txt', 'r') as f:
+        prompt_path = os.path.join(os.path.dirname(__file__), '..', 'prompts', 'draft_writer_prompt.txt')
+        with open(prompt_path, 'r') as f:
             return f.read()
     except FileNotFoundError:
         logger.error("Draft writer prompt file not found.")

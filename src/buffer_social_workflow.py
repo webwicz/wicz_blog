@@ -97,7 +97,7 @@ def generate_teaser_snippet(title, description, link):
         return snippet
     except Exception as e:
         logger.error(f"Error generating teaser: {e}")
-        # Fallback to simple format
+        # Fallback
         return f"Check out: {title} {link}"
 
 def format_buffer_post(title, link, teaser):
@@ -170,7 +170,7 @@ def schedule_buffer_post(content, platforms, delay_minutes=60):
         logger.error(f"Error scheduling Buffer post: {e}")
         raise
 
-def run_social_workflow(feed_url=None, platforms=['linkedin', 'twitter'], delay_minutes=60, last_checked_file='../data/last_checked.txt'):
+def run_social_workflow(feed_url=None, platforms=['linkedin', 'twitter'], delay_minutes=60, last_checked_file=None):
     """
     Main workflow: Check RSS, process new posts, schedule social media posts.
 
@@ -184,6 +184,9 @@ def run_social_workflow(feed_url=None, platforms=['linkedin', 'twitter'], delay_
         feed_url = feed_url or os.getenv('RSS_FEED_URL')
         if not feed_url:
             raise ValueError("RSS_FEED_URL not set")
+
+        if last_checked_file is None:
+            last_checked_file = os.path.join(os.path.dirname(__file__), '..', 'data', 'last_checked.txt')
 
         # Load last checked time
         last_checked = None
