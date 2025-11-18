@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 # Load environment variables
 load_dotenv(dotenv_path='../config/.env')
 
-# Initialize OpenAI client
-client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+# Initialize x.ai client
+client = OpenAI(api_key=os.getenv('XAI_API_KEY'), base_url="https://api.x.ai/v1")
 
 def load_prompt():
     """Load the topic generation prompt from file."""
@@ -42,7 +42,7 @@ def generate_topics(num_topics=5):
         prompt = load_prompt().format(num_topics=num_topics)
 
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="grok-4-fast-non-reasoning",
             messages=[
                 {"role": "system", "content": "You are an expert HCM content strategist."},
                 {"role": "user", "content": prompt}

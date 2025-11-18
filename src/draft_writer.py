@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 # Load environment variables
 load_dotenv(dotenv_path='../config/.env')
 
-# Initialize OpenAI client
-client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+# Initialize x.ai client
+client = OpenAI(api_key=os.getenv('XAI_API_KEY'), base_url="https://api.x.ai/v1")
 
 def load_prompt():
     """Load the draft writer prompt from file."""
@@ -42,7 +42,7 @@ def write_draft(brief):
         prompt = load_prompt().format(brief=brief)
 
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="grok-4-fast-non-reasoning",
             messages=[
                 {"role": "system", "content": "You are a professional blog writer for HCM topics."},
                 {"role": "user", "content": prompt}

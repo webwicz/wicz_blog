@@ -20,8 +20,8 @@ logger = logging.getLogger(__name__)
 # Load environment variables
 load_dotenv(dotenv_path='../config/.env')
 
-# Initialize OpenAI client for snippet generation
-client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+# Initialize x.ai client for snippet generation
+client = OpenAI(api_key=os.getenv('XAI_API_KEY'), base_url="https://api.x.ai/v1")
 
 def parse_rss_feed(feed_url, last_checked=None):
     """
@@ -83,7 +83,7 @@ def generate_teaser_snippet(title, description, link):
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="grok-4-fast-non-reasoning",
             messages=[
                 {"role": "system", "content": "You are a social media copywriter."},
                 {"role": "user", "content": prompt}
