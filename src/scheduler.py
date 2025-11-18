@@ -30,6 +30,25 @@ def is_monday():
     """Check if today is Monday."""
     return datetime.now().weekday() == 0
 
+def create_nextcloud_directory(dir_path, base_url, username, password):
+    """
+    Create a directory in Nextcloud via WebDAV if it doesn't exist.
+
+    Args:
+        dir_path (str): Directory path to create
+        base_url (str): Nextcloud WebDAV base URL
+        username (str): Nextcloud username
+        password (str): Nextcloud password
+    """
+    try:
+        response = requests.request('MKCOL', f"{base_url}{dir_path}", auth=(username, password))
+        if response.status_code in [201, 405]:  # 201 created, 405 already exists
+            logger.info(f"Directory {dir_path} ready in Nextcloud")
+        else:
+            logger.warning(f"Failed to create directory {dir_path}: {response.status_code}")
+    except Exception as e:
+        logger.error(f"Error creating Nextcloud directory: {e}")
+
 def upload_to_nextcloud(file_path, remote_path):
     """
     Upload a file to Nextcloud via WebDAV.
@@ -63,24 +82,52 @@ def upload_to_nextcloud(file_path, remote_path):
     except Exception as e:
         logger.error(f"Error uploading to Nextcloud: {e}")
 
-def create_nextcloud_directory(dir_path, base_url, username, password):
+def list_nextcloud_files(remote_path=""):
     """
-    Create a directory in Nextcloud via WebDAV if it doesn't exist.
+    List files in Nextcloud directory via WebDAV.
 
     Args:
-        dir_path (str): Directory path to create
-        base_url (str): Nextcloud WebDAV base URL
-        username (str): Nextcloud username
-        password (str): Nextcloud password
+        remote_path (str): Remote path to list (empty for root)
+
+    Returns:
+        list: List of files/directories
     """
     try:
-        response = requests.request('MKCOL', f"{base_url}{dir_path}", auth=(username, password))
-        if response.status_code in [201, 405]:  # 201 created, 405 already exists
-            logger.info(f"Directory {dir_path} ready in Nextcloud")
+        nextcloud_url = os.getenv('NEXTCLOUD_URL')
+        username = os.getenv('NEXTCLOUD_USERNAME')
+        password = os.getenv('NEXTCLOUD_PASSWORD')
+
+        if not all([nextcloud_url, username, password]):
+            logger.warning("Nextcloud credentials not set")
+            return []
+
+        url = f"{nextcloud_url}{remote_path}"
+        response = requests.request('PROPFIND', url, auth=(username, password))
+
+        if response.status_code == 207:  # Multi-status response
+            # Parse XML response to get file list
+            import xml.etree.ElementTree as ET
+            root = ET.fromstring(response.content)
+
+            files = []
+            for response_elem in root.findall('.//{DAV:}response'):
+                href_elem = response_elem.find('.//{DAV:}href')
+                if href_elem is not None:
+                    path = href_elem.text
+                    # Remove the base path to get relative paths
+                    if path.startswith('/remote.php/dav/files/'):
+                        path = path.split('/', 5)[-1] if len(path.split('/')) > 5 else ''
+                    files.append(path)
+
+            logger.info(f"Files in Nextcloud {remote_path}: {files}")
+            return files
         else:
-            logger.warning(f"Failed to create directory {dir_path}: {response.status_code}")
+            logger.error(f"Failed to list Nextcloud files: {response.status_code}")
+            return []
+
     except Exception as e:
-        logger.error(f"Error creating Nextcloud directory: {e}")
+        logger.error(f"Error listing Nextcloud files: {e}")
+        return []
 
 def run_weekly_workflow():
     """Run weekly research on Monday."""
